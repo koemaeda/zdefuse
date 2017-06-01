@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_INTF" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOINTERF>
+    <CLSNAME>ZIF_DEFUSE_OBJECT</CLSNAME>
+    <VERSION>1</VERSION>
+    <LANGU>E</LANGU>
+    <DESCRIPT>zDefuse - ABAP object</DESCRIPT>
+    <EXPOSURE>2</EXPOSURE>
+    <STATE>1</STATE>
+    <UNICODE>X</UNICODE>
+   </VSEOINTERF>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>ZIF_DEFUSE_OBJECT</CLSNAME>
+     <CMPNAME>CHILDREN</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Children nodes</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZIF_DEFUSE_OBJECT</CLSNAME>
+     <CMPNAME>CHILDREN</CMPNAME>
+     <LANGU>P</LANGU>
+     <DESCRIPT>Children nodes</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZIF_DEFUSE_OBJECT</CLSNAME>
+     <CMPNAME>ID</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>ABAP object</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZIF_DEFUSE_OBJECT</CLSNAME>
+     <CMPNAME>ID</CMPNAME>
+     <LANGU>P</LANGU>
+     <DESCRIPT>ABAP object</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZIF_DEFUSE_OBJECT</CLSNAME>
+     <CMPNAME>PACKAGE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Package</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZIF_DEFUSE_OBJECT</CLSNAME>
+     <CMPNAME>PACKAGE</CMPNAME>
+     <LANGU>P</LANGU>
+     <DESCRIPT>Package</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZIF_DEFUSE_OBJECT</CLSNAME>
+     <CMPNAME>SEARCH_DOWN</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Search for down nodes - Objects referenced by this one</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZIF_DEFUSE_OBJECT</CLSNAME>
+     <CMPNAME>SEARCH_DOWN</CMPNAME>
+     <LANGU>P</LANGU>
+     <DESCRIPT>Search for down nodes - Objects referenced by this one</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZIF_DEFUSE_OBJECT</CLSNAME>
+     <CMPNAME>SEARCH_UP</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Search for up nodes - Objects that reference this one</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZIF_DEFUSE_OBJECT</CLSNAME>
+     <CMPNAME>SEARCH_UP</CMPNAME>
+     <LANGU>P</LANGU>
+     <DESCRIPT>Search for up nodes - Objects that reference this one</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>
