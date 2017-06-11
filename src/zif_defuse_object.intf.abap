@@ -3,9 +3,10 @@ interface ZIF_DEFUSE_OBJECT
 
 
   data ID type ZCL_DEFUSE=>TY_OBJECT_ID read-only .
-  data PACKAGE type DEVCLASS .
-  data CHILDREN type ZCL_DEFUSE=>TY_T_NODE .
   data PARENT type ref to ZCL_DEFUSE .
+  data PATHS type ZCL_DEFUSE=>TY_T_OBJECT_PATH .
+  data CACHED_RESULTS_UP type ref to ZCL_DEFUSE=>TY_T_OBJECT .
+  data CACHED_RESULTS_DOWN type ref to ZCL_DEFUSE=>TY_T_OBJECT .
 
   methods SEARCH_UP
     returning

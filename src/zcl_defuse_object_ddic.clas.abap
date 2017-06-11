@@ -8,12 +8,8 @@ public section.
   interfaces ZIF_DEFUSE_OBJECT .
 protected section.
 
-  aliases CHILDREN
-    for ZIF_DEFUSE_OBJECT~CHILDREN .
   aliases ID
     for ZIF_DEFUSE_OBJECT~ID .
-  aliases PACKAGE
-    for ZIF_DEFUSE_OBJECT~PACKAGE .
   aliases PARENT
     for ZIF_DEFUSE_OBJECT~PARENT .
   aliases SEARCH_DOWN
@@ -28,8 +24,8 @@ ENDCLASS.
 CLASS ZCL_DEFUSE_OBJECT_DDIC IMPLEMENTATION.
 
 
-  method ZIF_DEFUSE_OBJECT~SEARCH_DOWN.
-
+  method zif_defuse_object~search_down.
+    "// Must be redefined!
   endmethod.
 
 

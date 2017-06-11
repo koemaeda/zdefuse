@@ -1,6 +1,6 @@
 *"* use this source file for your ABAP unit test classes
 
-class test_search_up definition for testing risk level harmless.
+class test_search_up definition for testing risk level harmless duration medium.
   private section.
     methods:
       program for testing,
@@ -11,7 +11,10 @@ class test_search_up definition for testing risk level harmless.
       class_method_code for testing,
       web_dynpro for testing,
       table_type for testing,
-      type_pool for testing.
+      type_pool for testing,
+      matchcode_table for testing,
+      matchcode_text for testing,
+      view for testing.
 endclass.
 
 class test_search_up implementation.
@@ -55,7 +58,7 @@ class test_search_up implementation.
     data(lo_defuse) = new zcl_defuse( ).
     lo_defuse->filter_standard_objects = abap_false.
     lo_defuse->max_depth = 1.
-    lo_defuse->add_objects( value #( ( object = 'TABL' obj_name = 'LVC_S_INFO' ) ) ).
+    lo_defuse->add_objects( value #( ( object = 'TABL' obj_name = 'LVC_S_LAYL' ) ) ).
     data(lt_objects) = lo_defuse->get_objects_to_check( ).
 
     assign lt_objects[ object = 'CLSD' obj_name = 'CL_GUI_ALV_GRID' ] to field-symbol(<object>).
@@ -124,17 +127,95 @@ class test_search_up implementation.
     assign lt_objects[ object = 'PROG' obj_name = 'SAPHTMLPAGEEDITOR_DEMO1' ] to <object>.
     cl_aunit_assert=>assert_initial( sy-subrc ).
   endmethod.
+
+  method matchcode_table.
+    data(lo_defuse) = new zcl_defuse( ).
+    lo_defuse->filter_standard_objects = abap_false.
+    lo_defuse->max_depth = 1.
+    lo_defuse->add_objects( value #( ( object = 'TABL' obj_name = 'RSQISET' ) ) ).
+    data(lt_objects) = lo_defuse->get_objects_to_check( ).
+
+    assign lt_objects[ object = 'MCOB' obj_name = 'RSCTTISET' ] to field-symbol(<object>).
+    cl_aunit_assert=>assert_initial( sy-subrc ).
+  endmethod.
+
+  method matchcode_text.
+    data(lo_defuse) = new zcl_defuse( ).
+    lo_defuse->filter_standard_objects = abap_false.
+    lo_defuse->max_depth = 1.
+    lo_defuse->add_objects( value #( ( object = 'TABL' obj_name = 'RSQISETT' ) ) ).
+    data(lt_objects) = lo_defuse->get_objects_to_check( ).
+
+    assign lt_objects[ object = 'MCOB' obj_name = 'RSCTTISET' ] to field-symbol(<object>).
+    cl_aunit_assert=>assert_initial( sy-subrc ).
+  endmethod.
+
+  method view.
+    data(lo_defuse) = new zcl_defuse( ).
+    lo_defuse->filter_standard_objects = abap_false.
+    lo_defuse->max_depth = 1.
+    lo_defuse->add_objects( value #( ( object = 'TABL' obj_name = 'T624' ) ) ).
+    data(lt_objects) = lo_defuse->get_objects_to_check( ).
+
+    assign lt_objects[ object = 'VIEW' obj_name = 'V_T624' ] to field-symbol(<object>).
+    cl_aunit_assert=>assert_initial( sy-subrc ).
+  endmethod.
 endclass.
 
 
 class test_search_down definition for testing risk level harmless.
   private section.
     methods:
-      todo for testing.
+      data_element for testing,
+      foreign_key for testing,
+      reference_table for testing,
+      matchcode for testing.
 endclass.
 
 class test_search_down implementation.
-  method todo.
-    cl_aunit_assert=>fail( 'NOT IMPLEMENTED' ).
+  method data_element.
+    data(lo_defuse) = new zcl_defuse( ).
+    lo_defuse->filter_standard_objects = abap_false.
+    lo_defuse->max_depth = 1.
+    lo_defuse->add_objects( value #( ( object = 'TABL' obj_name = 'USR41' ) ) ).
+    data(lt_objects) = lo_defuse->get_objects_to_check( ).
+
+    assign lt_objects[ object = 'DTEL' obj_name = 'XUBNAME' ] to field-symbol(<object>).
+    cl_aunit_assert=>assert_initial( sy-subrc ).
+    assign lt_objects[ object = 'DTEL' obj_name = 'XUTERMID' ] to <object>.
+    cl_aunit_assert=>assert_initial( sy-subrc ).
+  endmethod.
+
+  method foreign_key.
+    data(lo_defuse) = new zcl_defuse( ).
+    lo_defuse->filter_standard_objects = abap_false.
+    lo_defuse->max_depth = 1.
+    lo_defuse->add_objects( value #( ( object = 'TABL' obj_name = 'SEOCOMPO' ) ) ).
+    data(lt_objects) = lo_defuse->get_objects_to_check( ).
+
+    assign lt_objects[ object = 'TABL' obj_name = 'SEOCLASS' ] to field-symbol(<object>).
+    cl_aunit_assert=>assert_initial( sy-subrc ).
+  endmethod.
+
+  method reference_table.
+    data(lo_defuse) = new zcl_defuse( ).
+    lo_defuse->filter_standard_objects = abap_false.
+    lo_defuse->max_depth = 1.
+    lo_defuse->add_objects( value #( ( object = 'TABL' obj_name = 'WPOP' ) ) ).
+    data(lt_objects) = lo_defuse->get_objects_to_check( ).
+
+    assign lt_objects[ object = 'TABL' obj_name = 'MARA' ] to field-symbol(<object>).
+    cl_aunit_assert=>assert_initial( sy-subrc ).
+  endmethod.
+
+  method matchcode.
+    data(lo_defuse) = new zcl_defuse( ).
+    lo_defuse->filter_standard_objects = abap_false.
+    lo_defuse->max_depth = 1.
+    lo_defuse->add_objects( value #( ( object = 'TABL' obj_name = 'BAPI_0050_HEADER' ) ) ).
+    data(lt_objects) = lo_defuse->get_objects_to_check( ).
+
+    assign lt_objects[ object = 'MCOB' obj_name = 'FMCU_F4_VERSION' ] to field-symbol(<object>).
+    cl_aunit_assert=>assert_initial( sy-subrc ).
   endmethod.
 endclass.

@@ -10,12 +10,16 @@ public section.
     importing
       value(NAME) type CLIKE .
 protected section.
-private section.
 
   aliases ID
     for ZIF_DEFUSE_OBJECT~ID .
   aliases PARENT
     for ZIF_DEFUSE_OBJECT~PARENT .
+  aliases SEARCH_DOWN
+    for ZIF_DEFUSE_OBJECT~SEARCH_DOWN .
+  aliases SEARCH_UP
+    for ZIF_DEFUSE_OBJECT~SEARCH_UP .
+private section.
 ENDCLASS.
 
 

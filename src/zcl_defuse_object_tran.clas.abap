@@ -1,6 +1,5 @@
 class ZCL_DEFUSE_OBJECT_TRAN definition
   public
-  final
   create public .
 
 public section.

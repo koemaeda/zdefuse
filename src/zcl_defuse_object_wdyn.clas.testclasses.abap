@@ -20,9 +20,6 @@ class test_search_down implementation.
 
     assign lt_objects[ object = 'INTF' obj_name = 'IWCI_DEMO_TABLE' ] to field-symbol(<object>).
     cl_aunit_assert=>assert_initial( sy-subrc ).
-
-    assign lt_objects[ object = 'INTF' obj_name = 'IF_COMPONENTCONTROLLER' ] to <object>.
-    cl_aunit_assert=>assert_initial( sy-subrc ).
   endmethod.
 
   method controller_attribute.

@@ -12,6 +12,8 @@ public section.
   methods ZIF_DEFUSE_OBJECT~SEARCH_DOWN
     redefinition .
 protected section.
+
+  data TABLEDESCR type ref to CL_ABAP_TABLEDESCR .
 private section.
 ENDCLASS.
 
@@ -23,6 +25,17 @@ CLASS ZCL_DEFUSE_OBJECT_TTYP IMPLEMENTATION.
   method constructor.
     super->constructor( ).
     me->id = value #( pgmid = 'R3TR' object = 'TTYP' obj_name = name ).
+
+    "// Check if it really exists
+    cl_abap_typedescr=>describe_by_name(
+      exporting p_name = me->id-obj_name
+      receiving p_descr_ref = data(lo_type)
+      exceptions others = 4 ).
+    if lo_type is initial or lo_type->kind <> cl_abap_typedescr=>kind_table.
+      clear me->id.
+    else.
+      me->tabledescr ?= lo_type.
+    endif.
   endmethod.
 
 
@@ -30,9 +43,9 @@ CLASS ZCL_DEFUSE_OBJECT_TTYP IMPLEMENTATION.
     objects = super->search_down( ).
 
     "// Line type
-    data(lt_comps) = cl_salv_ddic=>get_by_name( me->id-obj_name ).
-    if lt_comps is not initial.
-      append parent->create_ddic_object( lt_comps[ 1 ]-tabname ) to objects.
+    data(lo_structdescr) = me->tabledescr->get_table_line_type( ).
+    if lo_structdescr is not initial.
+      append parent->create_ddic_object( lo_structdescr->absolute_name ) to objects.
     endif.
   endmethod.
 ENDCLASS.

@@ -1,20 +1,18 @@
 class ZCL_DEFUSE_OBJECT_INTF definition
   public
-  final
+  inheriting from ZCL_DEFUSE_OBJECT_CLSD
   create public .
 
 public section.
 
-  interfaces ZIF_DEFUSE_OBJECT .
-
   methods CONSTRUCTOR
     importing
       value(NAME) type CLIKE .
+
+  methods ZIF_DEFUSE_OBJECT~SEARCH_UP
+    redefinition .
 protected section.
 private section.
-
-  aliases ID
-    for ZIF_DEFUSE_OBJECT~ID .
 ENDCLASS.
 
 
@@ -23,17 +21,21 @@ CLASS ZCL_DEFUSE_OBJECT_INTF IMPLEMENTATION.
 
 
   method constructor.
+    super->constructor( name ).
     me->id = value #( pgmid = 'R3TR' object = 'INTF' obj_name = name ).
-
-    "// Get root name
-    replace regex '\\.+$' in me->id-obj_name with ''.
   endmethod.
 
 
-  method ZIF_DEFUSE_OBJECT~SEARCH_DOWN.
-  endmethod.
+  method zif_defuse_object~search_up.
+    objects = super->search_up( ).
 
-
-  method ZIF_DEFUSE_OBJECT~SEARCH_UP.
+    "// Interface implementations
+    select * from seometarel into table @data(lt_impl)
+      where refclsname = @me->id-obj_name and
+            reltype = '1'.
+    loop at lt_impl assigning field-symbol(<impl>).
+      append parent->create_object( value #( pgmid = 'LIMU'
+        object = 'CLSD' obj_name = <impl>-clsname ) ) to objects.
+    endloop.
   endmethod.
 ENDCLASS.
