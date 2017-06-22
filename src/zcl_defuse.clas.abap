@@ -744,12 +744,12 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
         append create_object( value #(
           pgmid = 'R3TR' object = 'PROG' obj_name = <module>-prog ) ) to objects.
       else.
-        data(lv_type) = type_conversion_table[ cross = <module>-type ].
+        assign type_conversion_table[ cross = <module>-type ] to field-symbol(<type>).
         if sy-subrc <> 0.
           log-point id zdefuse subkey 'CROSS_TYPE_NOT_SUPPORTED' fields <module>-type <module>-prog <module>-name.
-        elseif lv_type-repo is not initial.
+        elseif <type>-repo is not initial.
           append create_object( value #(
-            object = lv_type-repo obj_name = <module>-name ) ) to objects.
+            object = <type>-repo obj_name = <module>-name ) ) to objects.
         endif.
       endif.
     endloop.
@@ -758,12 +758,12 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
     select * from wbcrossgt into table @data(lt_gtypes)
       where include = @include.
     loop at lt_gtypes assigning field-symbol(<gtype>).
-      lv_type = type_conversion_table[ tag = <gtype>-otype ].
+      assign type_conversion_table[ tag = <gtype>-otype ] to <type>.
       if sy-subrc <> 0.
         log-point id zdefuse subkey 'TAG_NOT_SUPPORTED' fields <module>-type <module>-prog <module>-name.
         continue.
       endif.
-      case lv_type-tag.
+      case <type>-tag.
           "// Special objects
         when cl_abap_compiler=>tag_type.
           append create_ddic_object( <gtype>-name ) to objects.
@@ -782,9 +782,9 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
           endif.
         when others.
           "// Simple name matching
-          if lv_type-repo is not initial.
+          if <type>-repo is not initial.
             append create_object( value #(
-              object = lv_type-repo obj_name = <gtype>-name ) ) to objects.
+              object = <type>-repo obj_name = <gtype>-name ) ) to objects.
           endif.
       endcase.
     endloop.
