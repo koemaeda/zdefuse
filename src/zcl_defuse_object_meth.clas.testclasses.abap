@@ -6,6 +6,7 @@ class test_naming definition for testing risk level harmless duration short inhe
       full_name for testing,
       simple_name for testing,
       invalid_name for testing,
+      standard_name for testing,
       alias for testing.
 endclass.
 
@@ -41,6 +42,14 @@ class test_naming implementation.
     data(lo_obj) = create_object( value #( pgmid = 'LIMU' object = 'METH'
       obj_name = '\TY:CL_GUI_OBJECT\DA:ACTIVEX' ) ).
     cl_aunit_assert=>assert_initial( lo_obj ).
+  endmethod.
+
+  method standard_name.
+    me->filter_standard_objects = abap_false.
+    data(lo_obj) = create_object( value #( pgmid = 'LIMU' object = 'METH'
+      obj_name = 'CL_MSG_TESTER                 TEST1_T100' ) ).
+    cl_aunit_assert=>assert_not_initial( lo_obj ).
+    cl_aunit_assert=>assert_equals( act = lo_obj->id-obj_name exp = 'CL_MSG_TESTER=>TEST1_T100' ).
   endmethod.
 
   method alias.

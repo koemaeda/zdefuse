@@ -107,6 +107,14 @@ CLASS ZCL_DEFUSE_UI IMPLEMENTATION.
       html = html && |</tbody></table>\r\n|.
     endif.
 
+    "// Processed packages
+    if results-processed_packages is not initial.
+      html = html && |<b>Processed packages:</b>\r\n| &&
+        |<span style="font-family: monospace">| &&
+        concat_lines_of( table = results-processed_packages sep = |, | ) &&
+        |</span>\r\n|.
+    endif.
+
     "// Risk level
     html = html && |<h3>Result</h3>\r\n|.
     case results-risk_level.
@@ -134,7 +142,7 @@ CLASS ZCL_DEFUSE_UI IMPLEMENTATION.
       html = html && |<h3>Processing messages</h3>\r\n|.
       loop at results-messages assigning field-symbol(<message>).
         case <message>-type.
-          when 'E' or 'A' or 'X'. lv_class = 'error'.
+          when 'E' or 'A' or 'X'. lv_class = 'danger'.
           when 'W'. lv_class = 'warning'.
           when others. lv_class = 'info'.
         endcase.

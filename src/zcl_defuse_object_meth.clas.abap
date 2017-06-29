@@ -40,7 +40,14 @@ CLASS ZCL_DEFUSE_OBJECT_METH IMPLEMENTATION.
     replace regex '^\\TY:' in me->id-obj_name with ''.
     replace regex '\\IN:(\w+)\\ME:(\w+)' in me->id-obj_name with '=>$1~$2'.
     replace regex '\\ME:(\w+)' in me->id-obj_name with '=>$1'.
-    split me->id-obj_name at '=>' into me->classname me->methodname.
+    if me->id-obj_name cs '=>'.
+      split me->id-obj_name at '=>' into me->classname me->methodname.
+    else.
+      data(ls_method_key) = conv seocmpkey( me->id-obj_name ).
+      me->classname = ls_method_key-clsname.
+      me->methodname = ls_method_key-cmpname.
+      me->id-obj_name = |{ me->classname }=>{ me->methodname }|.
+    endif.
 
     "// Find include name
     cl_oo_include_naming=>get_instance_by_name(

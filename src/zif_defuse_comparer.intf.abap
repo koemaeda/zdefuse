@@ -5,7 +5,7 @@ interface ZIF_DEFUSE_COMPARER
   methods COMPARE_OBJECTS
     importing
       !OBJECTS type ZCL_DEFUSE=>TY_T_OBJECT_ID
-      !TARGET_SYSTEM type RFCDEST optional
+      !TARGET_SYSTEM type SYSYSID optional
     exporting
       value(TOTAL_COMPARED) type I
       value(DIFFERENT) type ZCL_DEFUSE=>TY_T_OBJECT_ID

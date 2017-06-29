@@ -45,10 +45,13 @@ public section.
   types:
     ty_t_compared_object type sorted table of ty_compared_object with unique key primary_key components id .
   types:
+    ty_t_package type sorted table of devclass with unique key primary_key components table_line .
+  types:
     begin of ty_results,
         target_system          type rfcdest,
         messages               type bapiret2_tab,
         risk_level             type i,
+        processed_packages     type ty_t_package,
         unsupported_objects    type ty_t_object_id,
         limited_objects        type ty_t_object_id,
         different_objects      type ty_t_compared_object,
@@ -107,7 +110,7 @@ public section.
       value(HTML) type STRING .
   methods RUN
     importing
-      value(TARGET_SYSTEM) type RFCDEST
+      value(TARGET_SYSTEM) type SYSYSID
     returning
       value(RESULTS) type TY_RESULTS .
   methods GET_OBJECTS_TO_CHECK
@@ -176,6 +179,16 @@ protected section.
       value(SUB) type TY_OBJECT_ID
     returning
       value(GLOBAL) type TY_OBJECT_ID .
+  class-methods GET_OBJECT_PACKAGE
+    importing
+      value(ID) type TY_OBJECT_ID
+    returning
+      value(PACKAGE) type DEVCLASS .
+  class-methods OBJECT_ID_TO_E071
+    importing
+      value(ID) type TY_OBJECT_ID
+    returning
+      value(E071) type E071 .
 private section.
 
   types:
@@ -198,6 +211,8 @@ private section.
     ty_object_id_range type range of ty_object_id .
   types:
     ty_t_ref_object_path type standard table of ref to ty_object_path with default key .
+  types:
+    ty_t_package_map type hashed table of devclass with unique key primary_key components table_line .
 
   data OBJECT_CACHE type TY_T_OBJECT_CACHE .
   data NODE_MAP type TY_NODE_MAP .
@@ -205,6 +220,7 @@ private section.
   data LIMITED_OBJECTS type TY_T_OBJECT_ID .
   data PROGRESS_MAP type TY_PROGRESS_MAP .
   data LAST_PROGRESS_TIME type SYUZEIT .
+  data PACKAGE_MAP type TY_T_PACKAGE_MAP .
 
   class-methods GET_TYPE_CONVERSION_TABLE
     returning
@@ -461,6 +477,13 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
         if sy-subrc <> 0.
           insert value #( id = instance->id ref = instance ) into table me->object_cache.
         endif.
+      endif.
+
+      "// Keep track of processed packages
+      data(lv_package) = get_object_package( instance->id ).
+      read table me->package_map with key table_line = lv_package transporting no fields.
+      if sy-subrc <> 0 and lv_package is not initial.
+        insert lv_package into table me->package_map.
       endif.
     endif.
   endmethod.
@@ -802,19 +825,49 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
 
     "// Remove root objects from the list
     loop at me->down_tree-root_nodes assigning field-symbol(<node>).
-      "// Exclude global object
+      "// Exclude exact-matching object ID
       delete objects where pgmid = <node>-id-pgmid and
                            object = <node>-id-object and
                            obj_name = <node>-id-obj_name.
 
-      "// Exclude subobjects
-      data(lt_subs) = global_to_subobjects( <node>-id ).
-      loop at lt_subs assigning field-symbol(<sub>).
-        delete objects where pgmid = <sub>-pgmid and
-                             object = <sub>-object and
-                             obj_name = <sub>-obj_name.
-      endloop.
+      if <node>-id-pgmid = 'R3TR'. "// Global object
+        "// Exclude subobjects
+        data(lt_subs) = global_to_subobjects( <node>-id ).
+        loop at lt_subs assigning field-symbol(<sub>).
+          delete objects where pgmid = <sub>-pgmid and
+                               object = <sub>-object and
+                               obj_name = <sub>-obj_name.
+        endloop.
+      else. "// Subobjects
+        "// Exclude global object, if practically they are the same
+        data(ls_global) = subobject_to_global( <node>-id ).
+        if 'PROG|DOMA|DTEL|TABL' cs ls_global-object.
+          delete objects where pgmid = ls_global-pgmid and
+                               object = ls_global-object and
+                               obj_name = ls_global-obj_name.
+        endif.
+      endif.
+
     endloop.
+  endmethod.
+
+
+  method get_object_package.
+    data(ls_e071) = object_id_to_e071( id ).
+
+    data(ls_tadir_key) = value tadir( ).
+    call function 'TR_CHECK_TYPE'
+      exporting
+        wi_e071              = ls_e071
+        iv_translate_objname = 'X'
+      importing
+        we_tadir             = ls_tadir_key.
+    if ls_tadir_key is not initial.
+      select single devclass from tadir into package
+        where pgmid = ls_tadir_key-pgmid and
+              object = ls_tadir_key-object and
+              obj_name = ls_tadir_key-obj_name.
+    endif.
   endmethod.
 
 
@@ -1107,12 +1160,27 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
   endmethod.
 
 
+  method object_id_to_e071.
+    e071 = corresponding #( id ).
+
+    case e071-object.
+      when 'METH'. "// Methods
+        data: ls_method_key type seocmpkey.
+        split e071-obj_name at '=>' into ls_method_key-clsname ls_method_key-cmpname.
+        if sy-subrc = 0.
+          e071-obj_name = ls_method_key.
+        endif.
+    endcase.
+  endmethod.
+
+
   method run.
     results-target_system = target_system.
 
     "// Copy Search results
     results-total_input_objects = lines( me->down_tree-root_nodes ).
     results-total_objects_analysed = lines( me->object_cache ).
+    results-processed_packages = corresponding #( me->package_map ).
 
     sort me->unsupported_objects. delete adjacent duplicates from me->unsupported_objects.
     results-unsupported_objects = me->unsupported_objects.
@@ -1139,15 +1207,7 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
     endloop.
     append lines of lt_comp_messages to results-messages.
 
-    "//----------------------------------------------------------------
-    "//   Determine the risk level
-    "//----------------------------------------------------------------
-
-    "// (1) The risk level starts as SAFE.
-    results-risk_level = risk_safe.
-
-    "// (2) Objects in the up tree (dependents) must exist in the target system
-    "//      to be relevant
+    "// Objects in the up tree (dependents) must exist in the target system to be relevant
     loop at results-different_objects assigning field-symbol(<not_found>)
         where not_found = abap_true.
       assign me->node_map[ id = <not_found>-id ]
@@ -1165,15 +1225,27 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
       endif.
     endloop.
 
-    "// (3) The risk level is UNKNOWN and the analysis is finished if:
+    "//----------------------------------------------------------------
+    "//   Determine the risk level
+    "//----------------------------------------------------------------
+
+    "// (1) The risk level starts as SAFE.
+    results-risk_level = risk_safe.
+
+    "// (2) The risk level is UNKNOWN and the analysis is finished if:
     "//   * Any relevant object was "limited" - has not been completely analysed
     "//      due to processing restrictions
+    "//   * There are error messages
     if results-limited_objects is not initial.
       results-risk_level = risk_unknown.
       return.
     endif.
+    loop at results-messages transporting no fields where type ca 'EAX'.
+      results-risk_level = risk_unknown.
+      return.
+    endloop.
 
-    "// (4) The risk level is WARNINGS if:
+    "// (3) The risk level is WARNINGS if:
     "//   * There are unsupported objects found in the Search
     "//   * Any compared object is different in the target system
     read table results-different_objects transporting no fields with key different = abap_true.
@@ -1181,7 +1253,7 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
       results-risk_level = risk_warnings.
     endif.
 
-    "// (5) The risk level is RISKY if:
+    "// (4) The risk level is RISKY if:
     "//   * Any object in the first level (depth=1) is different in the target system
     loop at results-different_objects assigning field-symbol(<different>)
         where different = abap_true.
@@ -1199,7 +1271,7 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
       endif.
     endloop.
 
-    "// (6) The risk level is DANGEROUS if:
+    "// (5) The risk level is DANGEROUS if:
     "//   * Any object in the down tree (dependencies) is not found in the target system
     loop at results-different_objects transporting no fields where not_found = abap_true.
       results-risk_level = risk_dangerous.

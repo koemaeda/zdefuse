@@ -40,7 +40,7 @@ start-of-selection.
   go_defuse->filter_standard_objects = p_fil_st.
 
   go_defuse->add_transports( gt_trkorr ).
-  data(ls_results) = go_defuse->run( conv #( p_tarsys ) ).
+  data(ls_results) = go_defuse->run( p_tarsys ).
 
   "// Show results
   go_ui->show_html( ls_results ).
