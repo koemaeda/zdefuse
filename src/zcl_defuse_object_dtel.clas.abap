@@ -26,7 +26,7 @@ CLASS ZCL_DEFUSE_OBJECT_DTEL IMPLEMENTATION.
   endmethod.
 
 
-  method ZIF_DEFUSE_OBJECT~SEARCH_DOWN.
+  method zif_defuse_object~search_down.
     objects = super->search_down( ).
 
     data(lv_rollname) = conv rollname( me->id-obj_name ).
@@ -34,13 +34,14 @@ CLASS ZCL_DEFUSE_OBJECT_DTEL IMPLEMENTATION.
       where rollname = @lv_rollname.
 
     "// Domain
-    if ls_dtel-domname is not initial.
-      append parent->create_ddic_object( ls_dtel-domname ) to objects.
+    if ls_dtel-domname is not initial and ls_dtel-reftype is initial.
+      append parent->create_object( value #( pgmid = 'R3TR'
+        object = 'DOMA' obj_name = ls_dtel-domname ) ) to objects.
     endif.
 
     "// Reference type
-    if ls_dtel-reftype is not initial.
-      append parent->create_ddic_object( ls_dtel-reftype ) to objects.
+    if ls_dtel-reftype ca 'CI'.
+      append parent->create_ddic_object( ls_dtel-domname ) to objects.
     endif.
 
     "// Parameter ID

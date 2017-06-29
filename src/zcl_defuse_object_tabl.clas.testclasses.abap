@@ -25,7 +25,7 @@ class test_search_up implementation.
     lo_defuse->add_objects( value #( ( object = 'TABL' obj_name = 'USR41' ) ) ).
     data(lt_objects) = lo_defuse->get_objects_to_check( ).
 
-    assign lt_objects[ object = 'PROG' obj_name = 'RSM04000_ALV' ] to field-symbol(<object>).
+    assign lt_objects[ object = 'PROG' obj_name = 'RSPOPUP' ] to field-symbol(<object>).
     cl_aunit_assert=>assert_initial( sy-subrc ).
   endmethod.
 
