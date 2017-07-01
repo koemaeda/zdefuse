@@ -12,7 +12,7 @@ class test_search_up definition for testing risk level harmless.
       web_dynpro for testing,
       table_type for testing,
       type_pool for testing,
-      matchcode for testing.
+      search_help for testing.
 endclass.
 
 class test_search_up implementation.
@@ -123,14 +123,14 @@ class test_search_up implementation.
     cl_aunit_assert=>assert_initial( sy-subrc ).
   endmethod.
 
-  method matchcode.
+  method search_help.
     data(lo_defuse) = new zcl_defuse( ).
     lo_defuse->filter_standard_objects = abap_false.
     lo_defuse->max_depth = 1.
     lo_defuse->add_objects( value #( ( object = 'DTEL' obj_name = 'RSQINFOSET' ) ) ).
     data(lt_objects) = lo_defuse->get_objects_to_check( ).
 
-    assign lt_objects[ object = 'MCOB' obj_name = 'RSCTTISET' ] to field-symbol(<object>).
+    assign lt_objects[ object = 'SHLP' obj_name = 'RSCTTISET' ] to field-symbol(<object>).
     cl_aunit_assert=>assert_initial( sy-subrc ).
   endmethod.
 endclass.
@@ -142,7 +142,7 @@ class test_search_down definition for testing risk level harmless.
       domain for testing,
       class_definition for testing,
       interface for testing,
-      matchcode for testing,
+      search_help for testing,
       parameter for testing.
 endclass.
 
@@ -181,14 +181,14 @@ class test_search_down implementation.
     cl_aunit_assert=>assert_initial( sy-subrc ).
   endmethod.
 
-  method matchcode.
+  method search_help.
     data(lo_defuse) = new zcl_defuse( ).
     lo_defuse->filter_standard_objects = abap_false.
     lo_defuse->max_depth = 1.
     lo_defuse->add_objects( value #( ( object = 'DTEL' obj_name = 'PS_NEBEN' ) ) ).
     data(lt_objects) = lo_defuse->get_objects_to_check( ).
 
-    assign lt_objects[ object = 'MCOB' obj_name = 'PR' ] to field-symbol(<object>).
+    assign lt_objects[ object = 'SHLP' obj_name = 'PR' ] to field-symbol(<object>).
     cl_aunit_assert=>assert_initial( sy-subrc ).
   endmethod.
 

@@ -171,7 +171,7 @@ protected section.
       value(INSTANCE) type ref to ZIF_DEFUSE_OBJECT .
   class-methods GLOBAL_TO_SUBOBJECTS
     importing
-      !GLOBAL type TY_OBJECT_ID
+      value(GLOBAL) type TY_OBJECT_ID
     returning
       value(SUBS) type TY_T_OBJECT_ID .
   class-methods SUBOBJECT_TO_GLOBAL
@@ -830,7 +830,8 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
                            object = <node>-id-object and
                            obj_name = <node>-id-obj_name.
 
-      if <node>-id-pgmid = 'R3TR'. "// Global object
+      if <node>-id-pgmid = 'R3TR' or "// Global object
+         <node>-id-object = 'CLSD'.
         "// Exclude subobjects
         data(lt_subs) = global_to_subobjects( <node>-id ).
         loop at lt_subs assigning field-symbol(<sub>).
@@ -839,6 +840,7 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
                                obj_name = <sub>-obj_name.
         endloop.
       else. "// Subobjects
+        "//
         "// Exclude global object, if practically they are the same
         data(ls_global) = subobject_to_global( <node>-id ).
         if 'PROG|DOMA|DTEL|TABL' cs ls_global-object.
@@ -999,7 +1001,8 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
       ( tag = cl_abap_compiler=>tag_transaction        cross = 'T'  repo = 'TRAN' )
       ( tag = cl_abap_compiler=>tag_set_get_id         cross = 'P'  repo = 'PARA' )
       ( tag = cl_abap_compiler=>tag_authority_object   cross = 'A'  repo = 'SUSO' )
-      ( tag = cl_abap_compiler=>tag_matchcode          cross = 'V'  repo = 'MCOB' )
+      ( tag = cl_abap_compiler=>tag_matchcode          cross = 'V'  repo = 'SHLP' )
+      ( tag = cl_abap_compiler=>tag_matchcode          cross = 'M'  repo = 'SHLP' )
       ( tag = cl_abap_compiler=>tag_program            cross = 'R'  repo = 'PROG' )
       ( tag = cl_abap_compiler=>tag_enhancement_exit   cross = '4'                )
       ( tag = cl_abap_compiler=>tag_enhancement_impl   cross = '5'  repo = 'ENHO' )
@@ -1114,11 +1117,17 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
           "//--------------------------------------------------
         when 'D'. "// Data dictionary
           "//--------------------------------------------------
-          if <found>-encl_objec is not initial.
-            append create_ddic_object( <found>-encl_objec ) to objects.
-          else.
-            append create_ddic_object( <found>-object ) to objects.
-          endif.
+          case <found>-object_cls.
+            when swbm_c_type_ddic_searchhelp or swbm_c_type_ddic_matchcode.
+              append create_object( value #( pgmid = 'R3TR' object = 'SHLP'
+                obj_name = <found>-object ) ) to objects.
+            when others.
+              if <found>-encl_objec is not initial.
+                append create_ddic_object( <found>-encl_objec ) to objects.
+              else.
+                append create_ddic_object( <found>-object ) to objects.
+              endif.
+          endcase.
       endcase. "<found>-object_cls(1)
     endloop.
 
@@ -1128,6 +1137,12 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
 
 
   method global_to_subobjects.
+    "// Class definitions are read as global objects
+    if global-object = 'CLSD'.
+      global-pgmid = 'R3TR'.
+      global-object = 'CLAS'.
+    endif.
+
     "// Use standard function to break down our object list
     "//  into fragments/global objects
     data: lt_fragments type table of vrso.
@@ -1297,9 +1312,14 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
 
 
   method update_progress.
-    "// Save on CPU and bandwidth (only 1 update/sec)
+    "// Save on CPU and bandwidth
+    "// (only 1 update/sec for dialog and 1/min for background)
     if depth > 0.
-      check me->last_progress_time <> sy-uzeit.
+      if sy-batch is initial.
+        check me->last_progress_time <> sy-uzeit.
+      else.
+        check me->last_progress_time(4) <> sy-uzeit(4).
+      endif.
       me->last_progress_time = sy-uzeit.
     endif.
 

@@ -121,7 +121,7 @@ class test_search_down definition for testing risk level harmless  duration medi
       transformation for testing,
       parameter for testing,
       auth_check for testing,
-      matchcode for testing.
+      search_help for testing.
 endclass.
 
 
@@ -499,14 +499,14 @@ class test_search_down implementation.
     cl_aunit_assert=>assert_initial( sy-subrc ).
   endmethod.
 
-  method matchcode.
+  method search_help.
     data(lv_caller) = generate_report( |PARAMETERS: dummy TYPE matnr MATCHCODE OBJECT mat1.| ).
     data(lo_defuse) = new zcl_defuse( ).
     lo_defuse->max_depth = 1.
     lo_defuse->filter_standard_objects = abap_false.
     data(lt_objects) = lo_defuse->add_objects( value #(
       ( pgmid = 'R3TR' object = 'PROG' obj_name = lv_caller ) ) )->get_objects_to_check( ).
-    assign lt_objects[ object = 'MCOB' obj_name = 'MAT1' ] to field-symbol(<object>).
+    assign lt_objects[ object = 'SHLP' obj_name = 'MAT1' ] to field-symbol(<object>).
     cl_aunit_assert=>assert_initial( sy-subrc ).
   endmethod.
 endclass.

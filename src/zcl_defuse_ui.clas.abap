@@ -11,6 +11,10 @@ public section.
   methods SHOW_HTML
     importing
       !RESULTS type ZCL_DEFUSE=>TY_RESULTS .
+  methods SEND_EMAIL
+    importing
+      !RESULTS type ZCL_DEFUSE=>TY_RESULTS
+      !RECEIVERS type STRINGTAB .
 protected section.
 
   data DEFUSE type ref to ZCL_DEFUSE .
@@ -141,11 +145,9 @@ CLASS ZCL_DEFUSE_UI IMPLEMENTATION.
     if results-messages is not initial.
       html = html && |<h3>Processing messages</h3>\r\n|.
       loop at results-messages assigning field-symbol(<message>).
-        case <message>-type.
-          when 'E' or 'A' or 'X'. lv_class = 'danger'.
-          when 'W'. lv_class = 'warning'.
-          when others. lv_class = 'info'.
-        endcase.
+        lv_class = switch string( <message>-type
+            when 'E' or 'A' or 'X' then 'danger'
+            when 'W' then 'warning' else 'info' ).
         html = html &&
           |<div class="alert alert-{ lv_class }" role="alert">{ <message>-message }</div>\r\n|.
       endloop.
@@ -237,16 +239,43 @@ CLASS ZCL_DEFUSE_UI IMPLEMENTATION.
 
 
   method on_progress.
-    data: lv_text type string value 'Analysis:'.
-
-    "// Show the progress information
+    data(lv_text) = |Analysis:|.
     loop at progress assigning field-symbol(<progress>).
       lv_text = lv_text && | [{ <progress>-depth }] { <progress>-progress }%|.
     endloop.
-    call function 'SAPGUI_PROGRESS_INDICATOR'
-      exporting
-        percentage = progress[ 1 ]-progress
-        text       = lv_text.
+
+    "// Show the progress information
+    if sy-batch is initial. "// Dialog
+      call function 'SAPGUI_PROGRESS_INDICATOR'
+        exporting
+          percentage = progress[ 1 ]-progress
+          text       = lv_text.
+    else. "// Job
+      message lv_text type 'S'.
+      commit work. "// To display in the job log
+    endif.
+  endmethod.
+
+
+  method send_email.
+    data(lv_subject) = |zDefuse Report ({
+      switch string( results-risk_level
+        when zcl_defuse=>risk_safe then 'Safe'
+        when zcl_defuse=>risk_warnings then 'Warnings'
+        when zcl_defuse=>risk_risky then 'RISKY'
+        when zcl_defuse=>risk_dangerous then 'DANGEROUS'
+        when zcl_defuse=>risk_unknown then 'UNKNOWN' )
+      })|.
+
+    data(lo_email) = new zcl_defuse_email( lv_subject ).
+    if results-risk_level >= zcl_defuse=>risk_risky.
+      lo_email->set_priority( '1' ). "// highest
+    endif.
+    lo_email->set_message( me->get_html( results ) ).
+    loop at receivers assigning field-symbol(<receiver>).
+      lo_email->add_recipient( address = <receiver> express = abap_true ).
+    endloop.
+    lo_email->send( ).
   endmethod.
 
 
@@ -278,8 +307,7 @@ CLASS ZCL_DEFUSE_UI IMPLEMENTATION.
         no_authority          = 9
         others                = 10.
     if sy-subrc <> 0.
-      message id sy-msgid type sy-msgty number sy-msgno
-        with sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+      message 'Could not open HTML document in Browser' type 'E'.
     endif.
   endmethod.
 ENDCLASS.

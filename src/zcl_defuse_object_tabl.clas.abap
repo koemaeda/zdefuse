@@ -78,7 +78,7 @@ CLASS ZCL_DEFUSE_OBJECT_TABL IMPLEMENTATION.
       where tabname = @lv_tabname.
     loop at lt_shelp assigning field-symbol(<shelp>).
       append parent->create_object( value #(
-        pgmid = 'R3TR' object = 'MCOB' obj_name = <shelp>-shlpname ) ) to objects.
+        pgmid = 'R3TR' object = 'SHLP' obj_name = <shelp>-shlpname ) ) to objects.
     endloop.
   endmethod.
 ENDCLASS.

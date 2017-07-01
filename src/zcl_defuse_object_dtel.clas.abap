@@ -53,7 +53,7 @@ CLASS ZCL_DEFUSE_OBJECT_DTEL IMPLEMENTATION.
     "// Search help
     if ls_dtel-shlpname is not initial.
       append parent->create_object( value #( pgmid = 'R3TR'
-        object = 'MCOB' obj_name = ls_dtel-shlpname ) ) to objects.
+        object = 'DTEL' obj_name = ls_dtel-shlpname ) ) to objects.
     endif.
   endmethod.
 ENDCLASS.

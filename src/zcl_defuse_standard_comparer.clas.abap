@@ -208,7 +208,7 @@ CLASS ZCL_DEFUSE_STANDARD_COMPARER IMPLEMENTATION.
     call function 'SVRS_MASSCOMPARE_OBJECTS'
       exporting
         iv_filter_lang        = 'X'
-        iv_ignore_report_text = 'X'
+*        iv_ignore_report_text = 'X' "// Causes RABAX when note 2320561 is not applied
       changing
         ct_compare_items      = lt_compare_results.
     total_compared = lines( lt_compare_results ).

@@ -25,6 +25,18 @@
      <LENGTH>60</LENGTH>
     </item>
     <item>
+     <ID>I</ID>
+     <KEY>T03</KEY>
+     <ENTRY>Output mode</ENTRY>
+     <LENGTH>60</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>T04</KEY>
+     <ENTRY>Options for sending</ENTRY>
+     <LENGTH>60</LENGTH>
+    </item>
+    <item>
      <ID>R</ID>
      <ENTRY>zDefuse - Check transport requests</ENTRY>
      <LENGTH>34</LENGTH>
@@ -43,9 +55,34 @@
     </item>
     <item>
      <ID>S</ID>
+     <KEY>P_RISKY</KEY>
+     <ENTRY>Send only if RISKY or worse</ENTRY>
+     <LENGTH>35</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_SEND</KEY>
+     <ENTRY>Send to emails / SAPOffice</ENTRY>
+     <LENGTH>34</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_SHOW</KEY>
+     <ENTRY>Show in browser (Dialog)</ENTRY>
+     <LENGTH>32</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
      <KEY>P_TARSYS</KEY>
      <ENTRY>Target System ID</ENTRY>
      <LENGTH>24</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>S_EMAIL</KEY>
+     <ENTRY>.</ENTRY>
+     <LENGTH>22</LENGTH>
+     <SPLIT>D</SPLIT>
     </item>
     <item>
      <ID>S</ID>
@@ -55,49 +92,6 @@
      <SPLIT>D</SPLIT>
     </item>
    </TPOOL>
-   <I18N_TPOOL>
-    <item>
-     <LANGUAGE>P</LANGUAGE>
-     <TEXTPOOL>
-      <item>
-       <ID>I</ID>
-       <KEY>T01</KEY>
-       <ENTRY>Objects to analyse</ENTRY>
-       <LENGTH>60</LENGTH>
-      </item>
-      <item>
-       <ID>I</ID>
-       <KEY>T02</KEY>
-       <ENTRY>Options</ENTRY>
-       <LENGTH>60</LENGTH>
-      </item>
-      <item>
-       <ID>R</ID>
-       <ENTRY>zDefuse - Check transport requests</ENTRY>
-       <LENGTH>70</LENGTH>
-      </item>
-      <item>
-       <ID>S</ID>
-       <KEY>P_MAX_DP</KEY>
-       <ENTRY>Maximum depth (recursivity)</ENTRY>
-       <LENGTH>35</LENGTH>
-      </item>
-      <item>
-       <ID>S</ID>
-       <KEY>P_TARSYS</KEY>
-       <ENTRY>Target System ID</ENTRY>
-       <LENGTH>24</LENGTH>
-      </item>
-      <item>
-       <ID>S</ID>
-       <KEY>S_TRKORR</KEY>
-       <ENTRY>.</ENTRY>
-       <LENGTH>20</LENGTH>
-       <SPLIT>D</SPLIT>
-      </item>
-     </TEXTPOOL>
-    </item>
-   </I18N_TPOOL>
   </asx:values>
  </asx:abap>
 </abapGit>

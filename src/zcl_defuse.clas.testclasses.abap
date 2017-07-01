@@ -378,6 +378,151 @@ class test_paths implementation.
 endclass.
 
 
+class test_check_list definition for testing risk level harmless duration short.
+  private section.
+    methods:
+      program_source for testing,
+      table_definition for testing,
+      data_element_definition for testing,
+      domain_definition for testing,
+      class_parts for testing.
+endclass.
+
+class test_check_list implementation.
+  method program_source.
+    "// Root node:   Can not check:
+    "// LIMU REPS => R3TR PROG
+    data(lo_defuse) = new zcl_defuse( ).
+    lo_defuse->filter_standard_objects = abap_false.
+    lo_defuse->max_depth = 1.
+    lo_defuse->add_objects( value #( ( object = 'REPS' obj_name = 'RSHOWTIM' ) ) ).
+    data(lt_objects) = lo_defuse->get_objects_to_check( ).
+    assign lt_objects[ object = 'PROG' obj_name = 'RSHOWTIM' ] to field-symbol(<object>).
+    cl_aunit_assert=>assert_not_initial( sy-subrc ).
+
+    "// Root node:   Can not check:
+    "// R3TR PROG => LIMU REPS
+    lo_defuse = new zcl_defuse( ).
+    lo_defuse->filter_standard_objects = abap_false.
+    lo_defuse->max_depth = 1.
+    lo_defuse->add_objects( value #( ( object = 'PROG' obj_name = 'RSHOWTIM' ) ) ).
+    lt_objects = lo_defuse->get_objects_to_check( ).
+    assign lt_objects[ object = 'REPS' obj_name = 'RSHOWTIM' ] to <object>.
+    cl_aunit_assert=>assert_not_initial( sy-subrc ).
+  endmethod.
+
+  method table_definition.
+    "// Root node:   Can not check:
+    "// LIMU TABD => R3TR TABL
+    data(lo_defuse) = new zcl_defuse( ).
+    lo_defuse->filter_standard_objects = abap_false.
+    lo_defuse->max_depth = 1.
+    lo_defuse->add_objects( value #( ( object = 'TABD' obj_name = 'USR41' ) ) ).
+    data(lt_objects) = lo_defuse->get_objects_to_check( ).
+    assign lt_objects[ object = 'TABL' obj_name = 'USR41' ] to field-symbol(<object>).
+    cl_aunit_assert=>assert_not_initial( sy-subrc ).
+
+    "// Root node:   Can not check:
+    "// R3TR TABL => LIMU TABD
+    lo_defuse = new zcl_defuse( ).
+    lo_defuse->filter_standard_objects = abap_false.
+    lo_defuse->max_depth = 1.
+    lo_defuse->add_objects( value #( ( object = 'TABL' obj_name = 'USR41' ) ) ).
+    lt_objects = lo_defuse->get_objects_to_check( ).
+    assign lt_objects[ object = 'TABD' obj_name = 'USR41' ] to <object>.
+    cl_aunit_assert=>assert_not_initial( sy-subrc ).
+  endmethod.
+
+  method data_element_definition.
+    "// Root node:   Can not check:
+    "// LIMU DTED => R3TR DTEL
+    data(lo_defuse) = new zcl_defuse( ).
+    lo_defuse->filter_standard_objects = abap_false.
+    lo_defuse->max_depth = 1.
+    lo_defuse->add_objects( value #( ( object = 'DTED' obj_name = 'XUTERMINAL' ) ) ).
+    data(lt_objects) = lo_defuse->get_objects_to_check( ).
+    assign lt_objects[ object = 'DTEL' obj_name = 'XUTERMINAL' ] to field-symbol(<object>).
+    cl_aunit_assert=>assert_not_initial( sy-subrc ).
+
+    "// Root node:   Can not check:
+    "// R3TR DTEL => LIMU DTED
+    lo_defuse = new zcl_defuse( ).
+    lo_defuse->filter_standard_objects = abap_false.
+    lo_defuse->max_depth = 1.
+    lo_defuse->add_objects( value #( ( object = 'DTEL' obj_name = 'XUTERMINAL' ) ) ).
+    lt_objects = lo_defuse->get_objects_to_check( ).
+    assign lt_objects[ object = 'DTED' obj_name = 'XUTERMINAL' ] to <object>.
+    cl_aunit_assert=>assert_not_initial( sy-subrc ).
+  endmethod.
+
+  method domain_definition.
+    "// Root node:   Can not check:
+    "// LIMU DOMD => R3TR DOMA
+    data(lo_defuse) = new zcl_defuse( ).
+    lo_defuse->filter_standard_objects = abap_false.
+    lo_defuse->max_depth = 1.
+    lo_defuse->add_objects( value #( ( object = 'DOMD' obj_name = 'XUTERMINAL' ) ) ).
+    data(lt_objects) = lo_defuse->get_objects_to_check( ).
+    assign lt_objects[ object = 'DOMA' obj_name = 'XUTERMINAL' ] to field-symbol(<object>).
+    cl_aunit_assert=>assert_not_initial( sy-subrc ).
+
+    "// Root node:   Can not check:
+    "// R3TR DOMA => LIMU DOMD
+    lo_defuse = new zcl_defuse( ).
+    lo_defuse->filter_standard_objects = abap_false.
+    lo_defuse->max_depth = 1.
+    lo_defuse->add_objects( value #( ( object = 'DOMA' obj_name = 'XUTERMINAL' ) ) ).
+    lt_objects = lo_defuse->get_objects_to_check( ).
+    assign lt_objects[ object = 'DOMD' obj_name = 'XUTERMINAL' ] to <object>.
+    cl_aunit_assert=>assert_not_initial( sy-subrc ).
+  endmethod.
+
+  method class_parts.
+    "// Root node:   Can not check:
+    "// LIMU METH => R3TR CLAS
+    "//              But must check the parent LIMU CLSD
+    data(lo_defuse) = new zcl_defuse( ).
+    lo_defuse->filter_standard_objects = abap_false.
+    lo_defuse->max_depth = 1.
+    lo_defuse->add_objects( value #( ( object = 'METH' obj_name = 'CL_T100_MESSAGE=>CONSTRUCTOR' ) ) ).
+    data(lt_objects) = lo_defuse->get_objects_to_check( ).
+    assign lt_objects[ object = 'CLAS' obj_name = 'CL_T100_MESSAGE' ] to field-symbol(<object>).
+    cl_aunit_assert=>assert_not_initial( sy-subrc ).
+    assign lt_objects[ object = 'CLSD' obj_name = 'CL_T100_MESSAGE' ] to <object>.
+    cl_aunit_assert=>assert_initial( sy-subrc ).
+
+    "// Root node:   Can not check:
+    "// R3TR CLAS => LIMU CLSD
+    "//              LIMU METH
+    lo_defuse = new zcl_defuse( ).
+    lo_defuse->filter_standard_objects = abap_false.
+    lo_defuse->max_depth = 1.
+    lo_defuse->add_objects( value #( ( object = 'CLAS' obj_name = 'CL_SAPSCRIPT_LONGTEXT' ) ) ).
+    lo_defuse->add_objects( value #( ( object = 'CLAS' obj_name = 'CL_T100_MESSAGE' ) ) ).
+    lt_objects = lo_defuse->get_objects_to_check( ).
+    assign lt_objects[ object = 'CLSD' obj_name = 'CL_T100_MESSAGE' ] to <object>.
+    cl_aunit_assert=>assert_not_initial( sy-subrc ).
+    assign lt_objects[ object = 'METH' obj_name = 'CL_T100_MESSAGE=>CONSTRUCTOR' ] to <object>.
+    cl_aunit_assert=>assert_not_initial( sy-subrc ).
+    assign lt_objects[ object = 'METH' obj_name = 'CL_SAPSCRIPT_LONGTEXT=>CREATE_FOR_MESSAGE' ] to <object>.
+    cl_aunit_assert=>assert_not_initial( sy-subrc ).
+
+    "// Root node:   Can not check:
+    "// LIMU CLSD => R3TR CLAS
+    "//              LIMU METH
+    lo_defuse = new zcl_defuse( ).
+    lo_defuse->filter_standard_objects = abap_false.
+    lo_defuse->max_depth = 1.
+    lo_defuse->add_objects( value #( ( object = 'CLSD' obj_name = 'CL_T100_MESSAGE' ) ) ).
+    lt_objects = lo_defuse->get_objects_to_check( ).
+    assign lt_objects[ object = 'CLAS' obj_name = 'CL_T100_MESSAGE' ] to <object>.
+    cl_aunit_assert=>assert_not_initial( sy-subrc ).
+    assign lt_objects[ object = 'METH' obj_name = 'CL_T100_MESSAGE=>CONSTRUCTOR' ] to <object>.
+    cl_aunit_assert=>assert_not_initial( sy-subrc ).
+  endmethod.
+endclass.
+
+
 class test_comparison definition for testing risk level harmless duration short inheriting from zcl_defuse.
   private section.
     methods:
