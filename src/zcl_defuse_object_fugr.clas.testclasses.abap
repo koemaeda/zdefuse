@@ -8,13 +8,17 @@ endclass.
 
 class test_search_down implementation.
   method function.
-    data(lo_defuse) = new zcl_defuse( ).
-    lo_defuse->filter_standard_objects = abap_false.
-    lo_defuse->max_depth = 1.
-    lo_defuse->add_objects( value #( ( object = 'FUGR' obj_name = 'SNI_ADDR' ) ) ).
-    data(lt_objects) = lo_defuse->get_objects_to_check( ).
+    data(lo_fugr) = cast zif_defuse_object( new zcl_defuse_object_fugr( 'SNI_ADDR' ) ).
+    lo_fugr->parent = new zcl_defuse( ).
+    lo_fugr->parent->filter_standard_objects = abap_false.
+    data(lt_objects) = lo_fugr->search_down( ).
 
-    assign lt_objects[ object = 'FUNC' obj_name = 'NI_NAME_TO_ADDR' ] to field-symbol(<object>).
-    cl_aunit_assert=>assert_initial( sy-subrc ).
+    data(lv_found) = 0.
+    loop at lt_objects assigning field-symbol(<object>).
+      if ( <object>->id-object = 'FUNC' and <object>->id-obj_name = 'NI_NAME_TO_ADDR' ).
+        add 1 to lv_found.
+      endif.
+    endloop.
+    cl_aunit_assert=>assert_equals( exp = 1 act = lv_found ).
   endmethod.
 endclass.

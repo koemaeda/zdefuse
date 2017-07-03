@@ -113,7 +113,7 @@ CLASS ZCL_DEFUSE_OBJECT_CLSD IMPLEMENTATION.
       where clsname = @me->id-obj_name and
             reltype = '1'.
     loop at lt_interf assigning field-symbol(<interf>).
-      append parent->create_object( value #( pgmid = 'LIMU'
+      append parent->create_object( value #( pgmid = 'R3TR'
         object = 'INTF' obj_name = <interf>-refclsname ) ) to objects.
     endloop.
 

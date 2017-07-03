@@ -149,10 +149,10 @@ class test_search_up implementation.
     data(lo_defuse) = new zcl_defuse( ).
     lo_defuse->filter_standard_objects = abap_false.
     lo_defuse->max_depth = 1.
-    lo_defuse->add_objects( value #( ( object = 'CLSD' obj_name = 'CL_DMS_CNV_MULTILEVEL' ) ) ).
+    lo_defuse->add_objects( value #( ( object = 'CLSD' obj_name = 'CL_T100_MESSAGE' ) ) ).
     data(lt_objects) = lo_defuse->get_objects_to_check( ).
 
-    assign lt_objects[ object = 'METH' obj_name = 'CL_DMS_CNV_MULTILEVEL=>IF_DMS_CNV~XML_CREATE' ]
+    assign lt_objects[ object = 'METH' obj_name = 'CL_CTS_ORGANIZER_WD_MAIN=>IF_CTS_ORGANIZER_WD_MAIN~NAVIGATE_ON_MESSAGE_AREA' ]
       to field-symbol(<object>).
     cl_aunit_assert=>assert_initial( sy-subrc ).
   endmethod.
@@ -395,63 +395,81 @@ class test_search_down_imp implementation.
   endmethod.
 
   method methods.
-    data(lo_defuse) = new zcl_defuse( ).
-    lo_defuse->filter_standard_objects = abap_false.
-    lo_defuse->max_depth = 1.
-    lo_defuse->add_objects( value #( ( object = 'CLSD' obj_name = 'CL_GUI_CALENDAR' ) ) ).
-    data(lt_objects) = lo_defuse->get_objects_to_check( ).
+    data(lo_clsd) = cast zif_defuse_object( new zcl_defuse_object_clsd( 'CL_GUI_CALENDAR' ) ).
+    lo_clsd->parent = new zcl_defuse( ).
+    lo_clsd->parent->filter_standard_objects = abap_false.
+    data(lt_objects) = lo_clsd->search_down( ).
 
-    assign lt_objects[ object = 'METH' obj_name = 'CL_GUI_CALENDAR=>SET_SELECTION' ] to field-symbol(<object>).
-    cl_aunit_assert=>assert_initial( sy-subrc ).
+    data(lv_found) = 0.
+    loop at lt_objects assigning field-symbol(<object>).
+      if ( <object>->id-object = 'METH' and <object>->id-obj_name = 'CL_GUI_CALENDAR=>SET_SELECTION' ).
+        add 1 to lv_found.
+      endif.
+    endloop.
+    cl_aunit_assert=>assert_equals( exp = 1 act = lv_found ).
   endmethod.
 
   method inherited_methods.
-    data(lo_defuse) = new zcl_defuse( ).
-    lo_defuse->filter_standard_objects = abap_false.
-    lo_defuse->max_depth = 1.
-    lo_defuse->add_objects( value #( ( object = 'CLSD' obj_name = 'CL_GUI_CALENDAR' ) ) ).
-    data(lt_objects) = lo_defuse->get_objects_to_check( ).
+    data(lo_clsd) = cast zif_defuse_object( new zcl_defuse_object_clsd( 'CL_GUI_CALENDAR' ) ).
+    lo_clsd->parent = new zcl_defuse( ).
+    lo_clsd->parent->filter_standard_objects = abap_false.
+    data(lt_objects) = lo_clsd->search_down( ).
 
-    "// Inherited (not redefined) methods not appear here
-    assign lt_objects[ object = 'METH' obj_name = 'CL_GUI_CALENDAR=>FREE' ] to field-symbol(<object>).
-    cl_aunit_assert=>assert_not_initial( sy-subrc ).
+    "// Inherited (not redefined) methods should not appear here
+    data(lv_found) = 0.
+    loop at lt_objects assigning field-symbol(<object>).
+      if ( <object>->id-object = 'METH' and <object>->id-obj_name = 'CL_GUI_CALENDAR=>FREE' ).
+        add 1 to lv_found.
+      endif.
+    endloop.
+    cl_aunit_assert=>assert_equals( exp = 0 act = lv_found ).
   endmethod.
 
   method redefined_methods.
-    data(lo_defuse) = new zcl_defuse( ).
-    lo_defuse->filter_standard_objects = abap_false.
-    lo_defuse->max_depth = 1.
-    lo_defuse->add_objects( value #( ( object = 'CLSD' obj_name = 'CL_GUI_MOVIE' ) ) ).
-    data(lt_objects) = lo_defuse->get_objects_to_check( ).
+    data(lo_clsd) = cast zif_defuse_object( new zcl_defuse_object_clsd( 'CL_GUI_MOVIE' ) ).
+    lo_clsd->parent = new zcl_defuse( ).
+    lo_clsd->parent->filter_standard_objects = abap_false.
+    data(lt_objects) = lo_clsd->search_down( ).
 
-    assign lt_objects[ object = 'METH' obj_name = 'CL_GUI_MOVIE=>DISPATCH' ] to field-symbol(<object>).
-    cl_aunit_assert=>assert_initial( sy-subrc ).
+    data(lv_found) = 0.
+    loop at lt_objects assigning field-symbol(<object>).
+      if ( <object>->id-object = 'METH' and <object>->id-obj_name = 'CL_GUI_MOVIE=>DISPATCH' ).
+        add 1 to lv_found.
+      endif.
+    endloop.
+    cl_aunit_assert=>assert_equals( exp = 1 act = lv_found ).
   endmethod.
 
   method interface_methods.
-    data(lo_defuse) = new zcl_defuse( ).
-    lo_defuse->filter_standard_objects = abap_false.
-    lo_defuse->max_depth = 2.
-    lo_defuse->add_objects( value #( ( object = 'CLSD' obj_name = 'CL_ABAP_STRING_C_WRITER' ) ) ).
-    data(lt_objects) = lo_defuse->get_objects_to_check( ).
+    data(lo_clsd) = cast zif_defuse_object( new zcl_defuse_object_clsd( 'CL_ABAP_STRING_C_WRITER' ) ).
+    lo_clsd->parent = new zcl_defuse( ).
+    lo_clsd->parent->filter_standard_objects = abap_false.
+    data(lt_objects) = lo_clsd->search_down( ).
 
-    assign lt_objects[ object = 'INTF' obj_name = 'IF_ABAP_MEMORY_WRITER' ] to field-symbol(<object>).
-    cl_aunit_assert=>assert_initial( sy-subrc ).
-    assign lt_objects[ object = 'METH' obj_name = 'CL_ABAP_STRING_C_WRITER=>IF_ABAP_MEMORY_WRITER~GET_RESULT_TYPE' ] to <object>.
-    cl_aunit_assert=>assert_initial( sy-subrc ).
+    data(lv_found) = 0.
+    loop at lt_objects assigning field-symbol(<object>).
+      if ( <object>->id-object = 'INTF' and <object>->id-obj_name = 'IF_ABAP_STRING_WRITER' ) or
+         ( <object>->id-object = 'METH' and <object>->id-obj_name = 'CL_ABAP_STRING_C_WRITER=>IF_ABAP_MEMORY_WRITER~GET_RESULT_TYPE' ).
+        add 1 to lv_found.
+      endif.
+    endloop.
+    cl_aunit_assert=>assert_equals( exp = 2 act = lv_found ).
   endmethod.
 
   method interface_methods_alias.
-    data(lo_defuse) = new zcl_defuse( ).
-    lo_defuse->filter_standard_objects = abap_false.
-    lo_defuse->max_depth = 1.
-    lo_defuse->add_objects( value #( ( object = 'CLSD' obj_name = 'CL_HTTP_CLIENT' ) ) ).
-    data(lt_objects) = lo_defuse->get_objects_to_check( ).
+    data(lo_clsd) = cast zif_defuse_object( new zcl_defuse_object_clsd( 'CL_HTTP_CLIENT' ) ).
+    lo_clsd->parent = new zcl_defuse( ).
+    lo_clsd->parent->filter_standard_objects = abap_false.
+    data(lt_objects) = lo_clsd->search_down( ).
 
-    assign lt_objects[ object = 'INTF' obj_name = 'IF_HTTP_CLIENT' ] to field-symbol(<object>).
-    cl_aunit_assert=>assert_initial( sy-subrc ).
-    assign lt_objects[ object = 'METH' obj_name = 'CL_HTTP_CLIENT=>SEND' ] to <object>.
-    cl_aunit_assert=>assert_initial( sy-subrc ).
+    data(lv_found) = 0.
+    loop at lt_objects assigning field-symbol(<object>).
+      if ( <object>->id-object = 'INTF' and <object>->id-obj_name = 'IF_HTTP_CLIENT' ) or
+         ( <object>->id-object = 'METH' and <object>->id-obj_name = 'CL_HTTP_CLIENT=>SEND' ).
+        add 1 to lv_found.
+      endif.
+    endloop.
+    cl_aunit_assert=>assert_equals( exp = 2 act = lv_found ).
   endmethod.
 
   method types.

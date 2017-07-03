@@ -9,7 +9,8 @@ class test_zdefuse_to_standard definition for testing risk level harmless durati
       whole_class for testing,
       class_definition for testing,
       class_method for testing,
-      data_element for testing.
+      data_element for testing,
+      no_selection_screen for testing.
 endclass.
 
 class test_zdefuse_to_standard implementation.
@@ -19,9 +20,11 @@ class test_zdefuse_to_standard implementation.
     ).
     data(lt_std) = object_list_zdef_to_standard( lt_zdef ).
 
-    assign lt_std[ object = 'REPS' obj_name = 'DEMO_DYNPRO_FIELD' ] to field-symbol(<std>).
+    assign lt_std[ fragment = 'REPS' fragname = 'DEMO_DYNPRO_FIELD' ] to field-symbol(<std>).
     cl_aunit_assert=>assert_initial( sy-subrc ).
-    assign lt_std[ object = 'DYNP' obj_name = 'DEMO_DYNPRO_FIELD                       0100' ] to <std>.
+    assign lt_std[ fragment = 'REPT' fragname = 'DEMO_DYNPRO_FIELD' ] to <std>.
+    cl_aunit_assert=>assert_not_initial( sy-subrc ).
+    assign lt_std[ fragment = 'DYNP' ] to <std>.
     cl_aunit_assert=>assert_initial( sy-subrc ).
   endmethod.
 
@@ -31,10 +34,10 @@ class test_zdefuse_to_standard implementation.
     ).
     data(lt_std) = object_list_zdef_to_standard( lt_zdef ).
 
-    assign lt_std[ object = 'TABD' obj_name = 'SFLIGHT' ] to field-symbol(<std>).
+    assign lt_std[ fragment = 'TABD' fragname = 'SFLIGHT' ] to field-symbol(<std>).
     cl_aunit_assert=>assert_initial( sy-subrc ).
-    assign lt_std[ object = 'TABT' obj_name = 'SFLIGHT' ] to <std>.
-    cl_aunit_assert=>assert_initial( sy-subrc ).
+    assign lt_std[ fragment = 'TABT' fragname = 'SFLIGHT' ] to <std>.
+    cl_aunit_assert=>assert_not_initial( sy-subrc ).
   endmethod.
 
   method whole_class.
@@ -43,13 +46,13 @@ class test_zdefuse_to_standard implementation.
     ).
     data(lt_std) = object_list_zdef_to_standard( lt_zdef ).
 
-    assign lt_std[ object = 'CLSD' obj_name = 'CL_ABAP_COMPILER' ] to field-symbol(<std>).
+    assign lt_std[ fragment = 'CLSD' fragname = 'CL_ABAP_COMPILER' ] to field-symbol(<std>).
     cl_aunit_assert=>assert_initial( sy-subrc ).
-    assign lt_std[ object = 'CPUB' obj_name = 'CL_ABAP_COMPILER' ] to <std>.
+    assign lt_std[ fragment = 'CPUB' fragname = 'CL_ABAP_COMPILER' ] to <std>.
     cl_aunit_assert=>assert_initial( sy-subrc ).
-    assign lt_std[ object = 'CPRI' obj_name = 'CL_ABAP_COMPILER' ] to <std>.
+    assign lt_std[ fragment = 'CPRI' fragname = 'CL_ABAP_COMPILER' ] to <std>.
     cl_aunit_assert=>assert_initial( sy-subrc ).
-    assign lt_std[ object = 'METH' obj_name = 'CL_ABAP_COMPILER              CREATE' ] to <std>.
+    assign lt_std[ fragment = 'METH' fragname = 'CL_ABAP_COMPILER              CREATE' ] to <std>.
     cl_aunit_assert=>assert_initial( sy-subrc ).
   endmethod.
 
@@ -59,7 +62,7 @@ class test_zdefuse_to_standard implementation.
     ).
     data(lt_std) = object_list_zdef_to_standard( lt_zdef ).
 
-    assign lt_std[ object = 'CLSD' obj_name = 'CL_ABAP_COMPILER' ] to field-symbol(<std>).
+    assign lt_std[ fragment = 'CLSD' fragname = 'CL_ABAP_COMPILER' ] to field-symbol(<std>).
     cl_aunit_assert=>assert_initial( sy-subrc ).
   endmethod.
 
@@ -69,7 +72,7 @@ class test_zdefuse_to_standard implementation.
     ).
     data(lt_std) = object_list_zdef_to_standard( lt_zdef ).
 
-    assign lt_std[ object = 'METH' obj_name = 'CL_ABAP_COMPILER              CREATE' ]
+    assign lt_std[ fragment = 'METH' fragname = 'CL_ABAP_COMPILER              CREATE' ]
       to field-symbol(<std>).
     cl_aunit_assert=>assert_initial( sy-subrc ).
   endmethod.
@@ -80,8 +83,18 @@ class test_zdefuse_to_standard implementation.
     ).
     data(lt_std) = object_list_zdef_to_standard( lt_zdef ).
 
-    assign lt_std[ object = 'DTED' obj_name = 'SYBINPT' ] to field-symbol(<std>).
+    assign lt_std[ fragment = 'DTED' fragname = 'SYBINPT' ] to field-symbol(<std>).
     cl_aunit_assert=>assert_initial( sy-subrc ).
+  endmethod.
+
+  method no_selection_screen.
+    data(lt_zdef) = value zcl_defuse=>ty_t_object_id(
+      ( pgmid = 'R3TR' object = 'PROG' obj_name = 'RSHOWTIM' )
+    ).
+    data(lt_std) = object_list_zdef_to_standard( lt_zdef ).
+
+    assign lt_std[ fragment = 'DYNP' fragname = 'RSHOWTIM1000' ] to field-symbol(<std>).
+    cl_aunit_assert=>assert_not_initial( sy-subrc ).
   endmethod.
 endclass.
 

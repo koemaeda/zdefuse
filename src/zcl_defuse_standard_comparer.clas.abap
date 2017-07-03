@@ -137,7 +137,7 @@ CLASS ZCL_DEFUSE_STANDARD_COMPARER IMPLEMENTATION.
   endmethod.
 
 
-  method OBJECT_LIST_ZDEF_TO_STANDARD.
+  method object_list_zdef_to_standard.
     "// Based on FM SVRS_MASSCOMPARE_ACT_OBJECTS
     data: lt_e071            type table of e071,
           lt_bao             type table of bao6163,
@@ -159,13 +159,34 @@ CLASS ZCL_DEFUSE_STANDARD_COMPARER IMPLEMENTATION.
         et_tadir               = lt_tadir
         et_nonversionable_objs = lt_non_versionable.
 
+    "// Discard irrelevant/generated objects
+    loop at lt_bao assigning field-symbol(<bao>).
+      case <bao>-fragment.
+        when 'DYNP'. "// Selection screens
+          data(ls_screen_id) = conv dyn_id_num( <bao>-fragname ).
+          find regex |{ <bao>-obj_name }\\s*(\\d+)| in <bao>-fragname
+            submatches data(lv_screen_number).
+          select single type from d020s into @data(lv_dynptype)
+            where prog = @<bao>-obj_name and
+                  dnum = @lv_screen_number.
+          if lv_dynptype na ' IM'. "// Normal/subcreen/modal
+            delete table lt_bao from <bao>.
+            continue.
+          endif.
+        when 'REPT' or "// Report texts
+             'TABT'.   "// Technical attributes of a table
+          delete table lt_bao from <bao>.
+          continue.
+      endcase.
+    endloop.
+
     "// The TMS user usually isn't authorized to call SCWB_RESOLVE_OBJECT_LIST.
     "// Because of this, we build the comparison list locally, assuming all the
     "//  objects exist in both systems (this is what we hope, after all)
     "// Objects that eventualy are not found, are flagged as "not readable"
     "//  instead of "not versionable".
     data(lv_destination) = get_rfc_destination( target_system ).
-    loop at lt_bao assigning field-symbol(<bao>).
+    loop at lt_bao assigning <bao>.
       assign lt_tadir[ pgmid = <bao>-pgmid object = <bao>-object obj_name = <bao>-obj_name ]
         to field-symbol(<tadir>).
       check sy-subrc = 0.
@@ -207,34 +228,17 @@ CLASS ZCL_DEFUSE_STANDARD_COMPARER IMPLEMENTATION.
     "// Call standard comparison
     call function 'SVRS_MASSCOMPARE_OBJECTS'
       exporting
-        iv_filter_lang        = 'X'
-*        iv_ignore_report_text = 'X' "// Causes RABAX when note 2320561 is not applied
+        iv_filter_lang   = 'X'
+*       iv_ignore_report_text = 'X' "// Causes RABAX when note 2320561 is not applied
       changing
-        ct_compare_items      = lt_compare_results.
+        ct_compare_items = lt_compare_results.
     total_compared = lines( lt_compare_results ).
-
-    "// Discard useless results
-    delete lt_compare_results where equal = abap_true.
-    loop at lt_compare_results assigning field-symbol(<result>).
-      case <result>-fragment.
-        when 'DYNP'. "// Selection screens
-          find regex |{ <result>-obj_name }\\s*1000| in <result>-fragname.
-          if sy-subrc = 0.
-            delete table lt_compare_results from <result>.
-            continue.
-          endif.
-        when 'REPT' or "// Report texts
-             'TABT'.   "// Technical attributes of a table
-          delete table lt_compare_results from <result>.
-          continue.
-      endcase.
-    endloop.
 
     "// Separate the results into different lists
     data: lt_std_different type vrs_compare_item_tab,
           lt_std_not_found type vrs_compare_item_tab,
           lt_std_ignored   type vrs_compare_item_tab.
-    loop at lt_compare_results assigning <result>.
+    loop at lt_compare_results assigning field-symbol(<result>).
       if <result>-nonversionable = abap_true.
         append corresponding #( <result> ) to lt_std_ignored.
       elseif <result>-not_comparable = abap_true or <result>-not_readable = abap_true.

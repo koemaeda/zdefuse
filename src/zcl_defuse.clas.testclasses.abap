@@ -12,7 +12,8 @@ class test_ddic_objects definition for testing risk level harmless inheriting fr
       class_table for testing,
       typepool_type for testing,
       typepool_struct for testing,
-      typepool_table for testing.
+      typepool_table for testing,
+      view for testing.
 endclass.
 
 class test_ddic_objects implementation.
@@ -75,6 +76,12 @@ class test_ddic_objects implementation.
     cl_aunit_assert=>assert_not_initial( lo_obj ).
     cl_aunit_assert=>assert_equals( exp = 'TYPE' act = lo_obj->id-object ).
     cl_aunit_assert=>assert_equals( exp = 'CNHE' act = lo_obj->id-obj_name ).
+  endmethod.
+
+  method view.
+    data(lo_obj) = me->create_ddic_object( 'V_VCLDIR' ).
+    cl_aunit_assert=>assert_not_initial( lo_obj ).
+    cl_aunit_assert=>assert_equals( exp = 'VIEW' act = lo_obj->id-object ).
   endmethod.
 endclass.
 

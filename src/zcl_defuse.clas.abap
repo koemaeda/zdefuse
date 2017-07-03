@@ -404,6 +404,14 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
       return.
     endif.
 
+    "// View?
+    select count( * ) from dd25l into sy-dbcnt
+      where viewname = lv_name.
+    if sy-dbcnt > 0.
+      instance = create_object( id = value #( pgmid = 'R3TR' object = 'VIEW' obj_name = lv_name ) ).
+      return.
+    endif.
+
     "// Determine object type according to ABAP kind
     case lo_type->kind.
       when cl_abap_typedescr=>kind_class.
@@ -1314,14 +1322,12 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
   method update_progress.
     "// Save on CPU and bandwidth
     "// (only 1 update/sec for dialog and 1/min for background)
-    if depth > 0.
-      if sy-batch is initial.
-        check me->last_progress_time <> sy-uzeit.
-      else.
-        check me->last_progress_time(4) <> sy-uzeit(4).
-      endif.
-      me->last_progress_time = sy-uzeit.
+    if depth > 0 and sy-batch is initial.
+      check me->last_progress_time <> sy-uzeit.
+    elseif sy-batch is not initial.
+      check me->last_progress_time(4) <> sy-uzeit(4).
     endif.
+    me->last_progress_time = sy-uzeit.
 
     "// Update progress map
     assign me->progress_map[ depth = depth ] to field-symbol(<progress>).

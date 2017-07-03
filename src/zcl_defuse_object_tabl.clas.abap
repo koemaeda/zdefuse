@@ -11,6 +11,8 @@ public section.
 
   methods ZIF_DEFUSE_OBJECT~SEARCH_DOWN
     redefinition .
+  methods ZIF_DEFUSE_OBJECT~SEARCH_UP
+    redefinition .
 protected section.
 
   data STRUCTDESCR type ref to CL_ABAP_STRUCTDESCR .
@@ -80,5 +82,18 @@ CLASS ZCL_DEFUSE_OBJECT_TABL IMPLEMENTATION.
       append parent->create_object( value #(
         pgmid = 'R3TR' object = 'SHLP' obj_name = <shelp>-shlpname ) ) to objects.
     endloop.
+  endmethod.
+
+
+  method zif_defuse_object~search_up.
+    objects = super->search_up( ).
+
+    "// Table maintenance
+    select single area from tvdir into @data(lv_fugr)
+      where tabname = @me->id-obj_name.
+    if lv_fugr is not initial.
+      append parent->create_object( value #( pgmid = 'R3TR'
+        object = 'FUGR' obj_name = lv_fugr ) ) to objects.
+    endif.
   endmethod.
 ENDCLASS.

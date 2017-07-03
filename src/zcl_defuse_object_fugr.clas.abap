@@ -13,6 +13,8 @@ public section.
     redefinition .
 protected section.
 private section.
+
+  data PROGNAME type PROGNAME .
 ENDCLASS.
 
 
@@ -22,8 +24,8 @@ CLASS ZCL_DEFUSE_OBJECT_FUGR IMPLEMENTATION.
 
   method constructor.
     super->constructor( |SAPL{ name }| ).
-    me->id-pgmid = 'R3TR'.
-    me->id-object = 'FUGR'.
+    me->progname = me->id-obj_name.
+    me->id = value #( pgmid = 'R3TR' object = 'FUGR' obj_name = name ).
   endmethod.
 
 
@@ -32,7 +34,7 @@ CLASS ZCL_DEFUSE_OBJECT_FUGR IMPLEMENTATION.
 
     "// Read function modules
     select funcname from tfdir into table @data(lt_funcname)
-      where pname = @me->id-obj_name.
+      where pname = @me->progname.
     loop at lt_funcname assigning field-symbol(<funcname>).
       append parent->create_object( value #( pgmid = 'LIMU'
         object = 'FUNC' obj_name = <funcname> ) ) to objects.
