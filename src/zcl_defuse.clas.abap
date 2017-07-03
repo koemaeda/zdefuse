@@ -1320,14 +1320,10 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
 
 
   method update_progress.
-    "// Save on CPU and bandwidth
-    "// (only 1 update/sec for dialog and 1/min for background)
-    if depth > 0 and sy-batch is initial.
+    "// Save on CPU and bandwidth (max. 1 update/sec)
+    if depth > 0.
       check me->last_progress_time <> sy-uzeit.
-    elseif sy-batch is not initial.
-      check me->last_progress_time(4) <> sy-uzeit(4).
     endif.
-    me->last_progress_time = sy-uzeit.
 
     "// Update progress map
     assign me->progress_map[ depth = depth ] to field-symbol(<progress>).
@@ -1339,11 +1335,18 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
     <progress>-analysed = analysed.
     <progress>-progress = ( <progress>-analysed * 100 ) / <progress>-total.
 
-    "// Export progress information
+    "// If running on background -> max 1 event/minute
+    if sy-batch is not initial.
+      check me->last_progress_time(4) <> sy-uzeit(4).
+    endif.
+
+    "// Trigger progress information event
     data: lt_progress type ty_progress.
     do depth + 1 times.
       insert me->progress_map[ depth = sy-index - 1 ] into table lt_progress.
     enddo.
     raise event progress exporting progress = lt_progress.
+
+    me->last_progress_time = sy-uzeit.
   endmethod.
 ENDCLASS.
