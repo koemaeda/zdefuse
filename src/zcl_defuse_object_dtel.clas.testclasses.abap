@@ -23,7 +23,7 @@ class test_search_up implementation.
     lo_defuse->add_objects( value #( ( object = 'DTEL' obj_name = 'DDREFTYPE' ) ) ).
     data(lt_objects) = lo_defuse->get_objects_to_check( ).
 
-    assign lt_objects[ object = 'PROG' obj_name = 'RADADUT1' ] to field-symbol(<object>).
+    assign lt_objects[ object = 'REPS' obj_name = 'RADADUT1' ] to field-symbol(<object>).
     cl_aunit_assert=>assert_initial( sy-subrc ).
   endmethod.
 

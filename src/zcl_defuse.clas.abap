@@ -307,6 +307,10 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
     check depth <= max_depth.
     check node-ref is not initial.
 
+    "// Keep track of processed packages (for testing purposes)
+    data(ls_dc) = value zteste_package( devclass = get_object_package( node-id ) ).
+    insert zteste_package from ls_dc.
+
     "// Search for objects (or cached results)
     if node-direction = direction_up. "// Up
       if node-ref->cached_results_up is initial.
@@ -519,8 +523,15 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
           instance = create_object( id = value #( pgmid = 'LIMU' object = 'METH'
             obj_name = |{ lo_class->clskey-clsname }=>{ lv_methname }| ) ).
         else.
-          instance = create_object( id = value #( pgmid = 'LIMU' object = 'CLSD'
-            obj_name = lo_class->clskey-clsname ) ).
+          select single clstype from seoclass into @data(lv_clstype)
+            where clsname = @lo_class->clskey-clsname.
+          if lv_clstype = '1'. "// Interface
+            instance = create_object( id = value #( pgmid = 'R3TR' object = 'INTF'
+              obj_name = lo_class->clskey-clsname ) ).
+          else. "// Normal class
+            instance = create_object( id = value #( pgmid = 'LIMU' object = 'CLSD'
+              obj_name = lo_class->clskey-clsname ) ).
+          endif.
         endif.
         return.
       endif.
@@ -1072,7 +1083,12 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
         when 'P' or "// ABAP programs
              'O'.   "// Objects/classes
           "//--------------------------------------------------
-          append create_object_for_include( conv #( <found>-object ) ) to objects.
+          case <found>-object_cls.
+            when swbm_c_type_prg_dynpro.
+              append create_object_for_include( conv #( <found>-encl_objec ) ) to objects.
+            when others.
+              append create_object_for_include( conv #( <found>-object ) ) to objects.
+          endcase. "<found>-object_cls
           "//--------------------------------------------------
         when 'I'. "// Interfaces
           "//--------------------------------------------------

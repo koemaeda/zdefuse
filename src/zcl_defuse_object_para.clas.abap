@@ -14,6 +14,8 @@ private section.
 
   aliases ID
     for ZIF_DEFUSE_OBJECT~ID .
+  aliases PARENT
+    for ZIF_DEFUSE_OBJECT~PARENT .
 ENDCLASS.
 
 
@@ -26,12 +28,12 @@ CLASS ZCL_DEFUSE_OBJECT_PARA IMPLEMENTATION.
   endmethod.
 
 
-  method ZIF_DEFUSE_OBJECT~SEARCH_DOWN.
-    "// TODO
+  method zif_defuse_object~search_down.
+    "// SPA/GPA parameter don't reference anything
   endmethod.
 
 
-  method ZIF_DEFUSE_OBJECT~SEARCH_UP.
-    "// TODO
+  method zif_defuse_object~search_up.
+    objects = parent->get_where_used( '\SG:' && me->id-obj_name ).
   endmethod.
 ENDCLASS.
