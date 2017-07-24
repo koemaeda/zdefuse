@@ -150,7 +150,10 @@ protected section.
       value(INSTANCE) type ref to ZIF_DEFUSE_OBJECT .
   methods GET_WHERE_USED
     importing
-      value(FULLNAME) type STRING
+      value(FULLNAME) type STRING optional
+      value(OBJTYPE) type SEU_OBJTYP optional
+      value(OBJNAME) type CLIKE optional
+    preferred parameter FULLNAME
     returning
       value(OBJECTS) type TY_T_OBJECT .
   class-methods GET_TYPE_BY_NAME
@@ -1053,9 +1056,12 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
     "// Use the standard Where Used list
     data: lt_findstrings type table of string,
           lt_founds      type table of rsfindlst.
+    if objtype is not initial and objname is not initial.
+      append objname to lt_findstrings.
+    endif.
     call function 'RS_EU_CROSSREF'
       exporting
-        i_find_obj_cls           = ''
+        i_find_obj_cls           = conv euobj-id( objtype )
         no_dialog                = 'X'
         with_generated_objects   = 'X'
         i_full_name              = fullname
@@ -1359,7 +1365,10 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
     "// Trigger progress information event
     data: lt_progress type ty_progress.
     do depth + 1 times.
-      insert me->progress_map[ depth = sy-index - 1 ] into table lt_progress.
+      assign me->progress_map[ depth = sy-index - 1 ] to <progress>.
+      if sy-subrc = 0.
+        insert <progress> into table lt_progress.
+      endif.
     enddo.
     raise event progress exporting progress = lt_progress.
 
