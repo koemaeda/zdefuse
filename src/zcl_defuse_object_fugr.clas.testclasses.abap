@@ -3,10 +3,26 @@
 class test_search_down definition for testing risk level harmless duration short.
   private section.
     methods:
+      include for testing,
       function for testing.
 endclass.
 
 class test_search_down implementation.
+  method include.
+    data(lo_fugr) = cast zif_defuse_object( new zcl_defuse_object_fugr( 'SNI_ADDR' ) ).
+    lo_fugr->parent = new zcl_defuse( ).
+    lo_fugr->parent->filter_standard_objects = abap_false.
+    data(lt_objects) = lo_fugr->search_down( ).
+
+    data(lv_found) = 0.
+    loop at lt_objects assigning field-symbol(<object>).
+      if ( <object>->id-object = 'REPS' and <object>->id-obj_name = 'LSNI_ADDRTOP' ).
+        add 1 to lv_found.
+      endif.
+    endloop.
+    cl_aunit_assert=>assert_equals( exp = 1 act = lv_found ).
+  endmethod.
+
   method function.
     data(lo_fugr) = cast zif_defuse_object( new zcl_defuse_object_fugr( 'SNI_ADDR' ) ).
     lo_fugr->parent = new zcl_defuse( ).

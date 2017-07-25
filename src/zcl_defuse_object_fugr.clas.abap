@@ -1,18 +1,22 @@
 class ZCL_DEFUSE_OBJECT_FUGR definition
   public
-  inheriting from ZCL_DEFUSE_OBJECT_PROG
   create public .
 
 public section.
+
+  interfaces ZIF_DEFUSE_OBJECT.
 
   methods CONSTRUCTOR
     importing
       value(NAME) type CLIKE .
 
-  methods ZIF_DEFUSE_OBJECT~SEARCH_DOWN
-    redefinition .
 protected section.
 private section.
+
+  aliases ID
+    for ZIF_DEFUSE_OBJECT~ID .
+  aliases PARENT
+    for ZIF_DEFUSE_OBJECT~PARENT .
 
   data PROGNAME type PROGNAME .
 ENDCLASS.
@@ -23,14 +27,13 @@ CLASS ZCL_DEFUSE_OBJECT_FUGR IMPLEMENTATION.
 
 
   method constructor.
-    super->constructor( |SAPL{ name }| ).
-    me->progname = me->id-obj_name.
     me->id = value #( pgmid = 'R3TR' object = 'FUGR' obj_name = name ).
+    me->progname = 'SAPL' && me->id-obj_name.
   endmethod.
 
 
   method zif_defuse_object~search_down.
-    objects = super->search_down( ).
+    objects = parent->get_include_references( conv #( me->progname ) ).
 
     "// Read function modules
     select funcname from tfdir into table @data(lt_funcname)
@@ -39,5 +42,10 @@ CLASS ZCL_DEFUSE_OBJECT_FUGR IMPLEMENTATION.
       append parent->create_object( value #( pgmid = 'LIMU'
         object = 'FUNC' obj_name = <funcname> ) ) to objects.
     endloop.
+  endmethod.
+
+
+  method zif_defuse_object~search_up.
+    objects = parent->get_where_used( |\\PR:{ me->progname }| ).
   endmethod.
 ENDCLASS.

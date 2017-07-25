@@ -446,7 +446,12 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
 
     "// Filters
     if me->filter_standard_objects = abap_true.
-      check id-obj_name(1) ca 'ZY'. "// No standard objects!
+      if ( id-object = 'PROG' or id-object = 'REPS' ) and
+         id-obj_name(1) = 'L'. "// Include
+        check id-obj_name(2) ca 'ZY'.
+      else.
+        check id-obj_name(1) ca 'ZY'. "// No standard objects!
+      endif.
     endif.
 
     "// Check the cache (lightweight)
