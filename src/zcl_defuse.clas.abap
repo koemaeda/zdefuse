@@ -999,6 +999,10 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
         receiving p_descr_ref = type
         exceptions type_not_found = 1 ).
       if sy-subrc = 0.
+        "// Reference?
+        if type->kind = cl_abap_typedescr=>kind_ref.
+          type = cast cl_abap_refdescr( type )->get_referenced_type( ).
+        endif.
         real_name = type->get_relative_name( ).
         if real_name cs '%'.
           real_name = <fullname>.
