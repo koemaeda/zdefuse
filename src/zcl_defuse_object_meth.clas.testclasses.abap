@@ -7,7 +7,8 @@ class test_naming definition for testing risk level harmless duration short inhe
       simple_name for testing,
       invalid_name for testing,
       standard_name for testing,
-      alias for testing.
+      alias for testing,
+      inherited_method for testing.
 endclass.
 
 class test_naming implementation.
@@ -63,6 +64,16 @@ class test_naming implementation.
     cl_aunit_assert=>assert_initial( sy-subrc ).
     assign lt_names[ table_line = '\TY:CL_T100_MESSAGE\IN:IF_MESSAGE\ME:GET_TEXT' ] to <dummy>.
     cl_aunit_assert=>assert_initial( sy-subrc ).
+  endmethod.
+
+  method inherited_method.
+    me->filter_standard_objects = abap_false.
+    data(lo_obj) = create_object( value #( pgmid = 'LIMU' object = 'METH'
+      obj_name = 'CL_XMS_TRC_APPLICATION=>CALL_TRACE_GUI' ) ).
+    cl_aunit_assert=>assert_not_initial( lo_obj ).
+    "// Method is actually implemented in class CL_SWF_TRC_ABSTRACT_IMPL, but the class loaded when it's
+    "//  called is still the inherited one, so we keep this as the object ID
+    cl_aunit_assert=>assert_equals( act = lo_obj->id-obj_name exp = 'CL_XMS_TRC_APPLICATION=>CALL_TRACE_GUI' ).
   endmethod.
 endclass.
 

@@ -310,9 +310,9 @@ CLASS ZCL_DEFUSE IMPLEMENTATION.
     check depth <= max_depth.
     check node-ref is not initial.
 
-    "// Keep track of processed packages (for testing purposes)
-    data(ls_dc) = value zteste_package( devclass = get_object_package( node-id ) ).
-    insert zteste_package from ls_dc.
+*    "// Keep track of processed packages (for testing purposes)
+*    data(ls_dc) = value zteste_package( devclass = get_object_package( node-id ) ).
+*    insert zteste_package from ls_dc.
 
     "// Search for objects (or cached results)
     if node-direction = direction_up. "// Up

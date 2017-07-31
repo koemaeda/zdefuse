@@ -49,23 +49,37 @@ CLASS ZCL_DEFUSE_OBJECT_METH IMPLEMENTATION.
       me->id-obj_name = |{ me->classname }=>{ me->methodname }|.
     endif.
 
-    "// Find include name
-    cl_oo_include_naming=>get_instance_by_name(
-      exporting name = me->classname
-      receiving cifref = data(lo_naming_dummy)
-      exceptions others = 4 ).
-    data(lo_naming) = cast if_oo_class_incl_naming( lo_naming_dummy ).
-    if lo_naming is initial.
-      clear me->id. return.
-    endif.
+    "// Here we used a DO loop to search for the method up in the class inheritance
+    do. "// as in "don't stop until the method is found or we reach the top class"
 
-    lo_naming->get_include_by_mtdname( exporting mtdname = conv #( me->methodname )
-       receiving progname = me->include
-       exceptions others = 4 ).
-    if me->include is initial.
-      clear me->id. return.
-    endif.
-    me->methodname = lo_naming->get_mtdname_by_include( me->include ).
+      "// Find include name
+      cl_oo_include_naming=>get_instance_by_name(
+        exporting name = me->classname
+        receiving cifref = data(lo_naming_dummy)
+        exceptions others = 4 ).
+      data(lo_naming) = cast if_oo_class_incl_naming( lo_naming_dummy ).
+      if lo_naming is initial.
+        clear me->id. return. "// Class doesn't exist!
+      endif.
+
+      lo_naming->get_include_by_mtdname( exporting mtdname = conv #( me->methodname )
+         receiving progname = me->include
+         exceptions others = 4 ).
+      if me->include is initial.
+        "// Continue to search in the mother class
+        select single refclsname from seometarel into @me->classname
+          where clsname = @me->classname and
+                reltype = '2'.
+        if sy-subrc = 0.
+          continue.
+        else.
+          return. "// Reached the top class, method not found
+        endif.
+      endif.
+
+      me->methodname = lo_naming->get_mtdname_by_include( me->include ).
+      exit.
+    enddo. "// Class inheritance search
 
     "// Build (primary) fullname
     if me->methodname cs '~'.
