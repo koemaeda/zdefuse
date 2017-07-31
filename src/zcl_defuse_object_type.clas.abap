@@ -16,6 +16,8 @@ private section.
     for ZIF_DEFUSE_OBJECT~ID .
   aliases PARENT
     for ZIF_DEFUSE_OBJECT~PARENT .
+
+  methods TEST_ENHANCEMENT .
 ENDCLASS.
 
 
@@ -25,6 +27,11 @@ CLASS ZCL_DEFUSE_OBJECT_TYPE IMPLEMENTATION.
 
   method constructor.
     me->id = value #( pgmid = 'R3TR' object = 'TYPE' obj_name = name ).
+  endmethod.
+
+
+  method test_enhancement.
+
   endmethod.
 
 
