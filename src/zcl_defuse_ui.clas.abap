@@ -93,8 +93,8 @@ CLASS ZCL_DEFUSE_UI IMPLEMENTATION.
     html = html &&
       |<b>Target system/destination:</b> { results-target_system }<br>\r\n| &&
       |Total input objects: { results-total_input_objects number = environment }<br>\r\n| &&
-      |Toal objects analysed: { results-total_objects_analysed number = environment }<br>\r\n| &&
-      |Toal objects compared: { results-total_objects_compared number = environment }<br>\r\n| &&
+      |Total objects analysed: { results-total_objects_analysed number = environment }<br>\r\n| &&
+      |Total objects compared: { results-total_objects_compared number = environment }<br>\r\n| &&
       |<br>\r\n|.
 
     "// Transport numbers and descriptions
